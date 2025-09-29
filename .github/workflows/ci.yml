@@ -25,6 +25,10 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t breast-cancer-api .
+      - name: Save Docker image as tar
+        run: |
+          mkdir -p package
+          docker save breast-cancer-api:latest -o package/breast-cancer-api.tar
       # Opcional: Push a DockerHub
       # - name: Login to DockerHub
       #   uses: docker/login-action@v2
