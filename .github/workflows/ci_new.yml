@@ -44,7 +44,7 @@ jobs:
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/breast-cancer-api:latest
 
       - name: Upload Docker image as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: breast-cancer-api-image
           path: package/breast-cancer-api.tar
