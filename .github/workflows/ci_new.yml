@@ -1,0 +1,44 @@
+name: CI/CD Breast Cancer API
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python app/test_api.py
+
+      - name: Build Docker image
+        run: docker build -t breast-cancer-api .
+
+      - name: Save Docker image as tar
+        run: |
+          mkdir -p package
+          docker save breast-cancer-api:latest -o package/breast-cancer-api.tar
+
+      - name: Login to GHCR
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Tag Docker image for GHCR
+        run: docker tag breast-cancer-api ghcr.io/${{ github.repository_owner }}/mlops-breast-cancer-prediction:latest
+
+      - name: Push Docker image to GHCR
+        run: docker push ghcr.io/${{ github.repository_owner }}/mlops-breast-cancer-prediction:latest
